@@ -4,7 +4,7 @@
 %define _src %{_topdir}/SOURCES
 # Valid current basever numbers can be found at
 # http://omahaproxy.appspot.com/
-%define basever 43.0.2357.65
+%define basever 43.0.2357.130
 %define	debug_package %nil
 
 %ifarch %ix86
@@ -216,7 +216,7 @@ export PATH=`pwd`:$PATH
 #
 #export GYP_DEFINES=sysroot=
 # get resources for high dpi and touch
-export GYP_DEFINES="use_aura=1 enable_hidpi=1 enable_touch_ui=1 clang_use_plugins=0"
+export GYP_DEFINES="use_aura=1 enable_hidpi=1 enable_touch_ui=1 clang_use_plugins=0 enable_hotwording=0"
 
 
 export GYP_GENERATORS=ninja
@@ -239,8 +239,8 @@ build/gyp_chromium --depth=. \
 	-Dhost_clang=1 \
 %endif
 %else
-        -Dclang=0 \
-        -Dhost_clang=0 \
+	-Dclang=0 \
+	-Dhost_clang=0 \
 %endif
 	-Dclang_use_chrome_plugins=0 \
         -Dwerror='' \
