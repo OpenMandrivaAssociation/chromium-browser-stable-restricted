@@ -1,3 +1,6 @@
+# eol 'fix' corrupts some .bin files
+%define dont_fix_eol 1
+
 #define v8_ver 3.12.8
 %define crname chromium-browser
 %define _crdir %{_libdir}/%{crname}
