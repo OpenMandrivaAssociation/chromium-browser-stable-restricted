@@ -84,6 +84,7 @@ BuildRequires: 	bzip2-devel
 BuildRequires: 	jpeg-devel
 BuildRequires: 	pkgconfig(libpng)
 BuildRequires:	gtk+3.0-devel
+BuildRequires:	gtk+2.0-devel
 BuildRequires: 	pkgconfig(nspr)
 BuildRequires: 	pkgconfig(zlib)
 BuildRequires: 	pkgconfig(xscrnsaver)
