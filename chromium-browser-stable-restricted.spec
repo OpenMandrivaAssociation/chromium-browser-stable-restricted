@@ -234,6 +234,7 @@ myconf_gn+=" fatal_linker_warnings=false "
 myconf_gn+=" system_libdir=\"%{_lib}\""
 myconf_gn+=" use_allocator=\"none\""
 myconf_gn+=" use_aura=true "
+myconf_gn+=" use_gconf=false"
 myconf_gn+=" use_gtk3=true "
 myconf_gn+=" enable_nacl=false "
 %if %{with plf}
