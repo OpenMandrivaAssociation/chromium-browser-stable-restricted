@@ -62,6 +62,8 @@ Patch15:        chromium-25.0.1364.172-sandbox-pie.patch
 #Patch18:	arm-neon.patch
 Patch19:	fix-ld-on-arm.patch
 
+Patch20:	chromium-last-commit-position-r0.patch
+
 Provides: 	%{crname}
 Obsoletes: 	chromium-browser-unstable < 26.0.1410.51
 Obsoletes: 	chromium-browser-beta < 26.0.1410.51
@@ -84,6 +86,7 @@ BuildRequires: 	bzip2-devel
 BuildRequires: 	jpeg-devel
 BuildRequires: 	pkgconfig(libpng)
 BuildRequires:	gtk+3.0-devel
+BuildRequires:	gtk+2.0-devel
 BuildRequires: 	pkgconfig(nspr)
 BuildRequires: 	pkgconfig(zlib)
 BuildRequires: 	pkgconfig(xscrnsaver)
