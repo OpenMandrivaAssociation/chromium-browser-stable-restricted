@@ -224,10 +224,14 @@ export CXX=g++
 export PATH=`pwd`:$PATH
 
 myconf_gn=" use_sysroot=false is_debug=false use_gold=true"
+%if %mdvver >= 201500
 %ifarch %arm
 myconf_gn+=" is_clang=false"
 %else
 myconf_gn+=" is_clang=true clang_base_path=\"/usr\" clang_use_chrome_plugins=false"
+%endif
+%else
+myconf_gn+=" is_clang=false"
 %endif
 
 myconf_gn+=" treat_warnings_as_errors=false"
