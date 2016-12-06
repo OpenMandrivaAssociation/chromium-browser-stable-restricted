@@ -77,6 +77,8 @@ BuildRequires: 	alsa-oss-devel
 %if %mdvver >= 201500
 BuildRequires:	atomic-devel
 BuildRequires:	harfbuzz-devel
+%else
+BuildRequires:	%{_lib}atomic1
 %endif
 BuildRequires: 	icu-devel
 BuildRequires: 	jsoncpp-devel
