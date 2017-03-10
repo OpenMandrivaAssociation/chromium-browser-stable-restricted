@@ -55,8 +55,6 @@ Source3:	master_preferences
 %endif
 Patch5:		chromium-54.0.2840.100-dont-crash-with-glibc-2.24.patch
 
-#Patch20:	chromium-last-commit-position-r0.patch
-
 ### Chromium Fedora Patches ###
 Patch1:         chromium-56.0.2924.87-gcc5.patch
 Patch2:         chromium-45.0.2454.101-linux-path-max.patch
@@ -467,7 +465,6 @@ myconf_gn+=" use_gtk3=true "
 myconf_gn+=" use_gtk3=false "
 %endif
 myconf_gn+=" enable_nacl=false "
-myconf_gn+=" use_ozone=true "
 %if %{with plf}
 myconf_gn+=" proprietary_codecs=true "
 myconf_gn+=" ffmpeg_branding=\"Chrome\" "
@@ -523,6 +520,10 @@ gn_system_libraries+=" libvpx"
 %if %{with system_ffmpeg}
 gn_system_libraries+=" ffmpeg"
 %endif
+
+# make up a version for widevine
+sed '14i#define WIDEVINE_CDM_VERSION_STRING "Something fresh"' -i "third_party/widevine/cdm/stub/widevine_cdm_version.h"
+
 python2 build/linux/unbundle/replace_gn_files.py --system-libraries ${gn_system_libraries}
 
 python2 tools/gn/bootstrap/bootstrap.py -v --gn-gen-args "${myconf_gn}"
