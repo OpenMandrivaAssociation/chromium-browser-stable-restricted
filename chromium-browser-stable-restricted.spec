@@ -492,7 +492,6 @@ myconf_gn+=" use_ozone=true "
 myconf_gn+=" enable_nacl=false "
 myconf_gn+=" proprietary_codecs=true "
 %if %{with plf}
-%endif
 myconf_gn+=" enable_nacl=false "
 myconf_gn+=" proprietary_codecs=true "
 myconf_gn+=" ffmpeg_branding=\"Chrome\" "
