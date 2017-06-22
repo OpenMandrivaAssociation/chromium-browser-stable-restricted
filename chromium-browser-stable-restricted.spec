@@ -334,6 +334,7 @@ keeplibs=(
     third_party/libphonenumber
     third_party/libsecret
     third_party/libsrtp
+    third_party/libdrm
     third_party/libudev
     third_party/libusb
     third_party/libwebm
@@ -354,6 +355,7 @@ keeplibs=(
     third_party/pdfium/third_party/agg23
     third_party/pdfium/third_party/base
     third_party/pdfium/third_party/bigint
+    third_party/pdfium/third_party/build
     third_party/pdfium/third_party/freetype
     third_party/pdfium/third_party/lcms2-2.6
     third_party/pdfium/third_party/libopenjpeg20
@@ -413,6 +415,11 @@ keeplibs+=(
     base/third_party/libevent
     third_party/adobe
     third_party/speech-dispatcher
+    third_party/swiftshader \
+    third_party/swiftshader/third_party/subzero \
+    third_party/swiftshader/third_party/LLVM \
+    third_party/swiftshader/third_party/llvm-subzero \
+    third_party/swiftshader/third_party/pnacl-subzero \
     third_party/usb_ids
     third_party/xdg-utils
     third_party/yasm/run_yasm.py
@@ -525,7 +532,6 @@ gn_system_libraries="
     libjpeg
     libpng
     libwebp
-    opus
     libusb
     libxml
     libxslt
