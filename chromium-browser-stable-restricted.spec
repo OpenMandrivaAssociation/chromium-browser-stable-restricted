@@ -26,7 +26,7 @@
 %bcond_with	gtk3
 # crisb - ozone causes a segfault on startup as of 57.0.2987.133
 %bcond_with	ozone
-%bcond_with	system_icu
+%bcond_without	system_icu
 %bcond_without	system_ffmpeg
 %bcond_without	system_minizip
 # chromium 58 fails with system vpx 1.6.1
@@ -184,6 +184,7 @@ BuildRequires: 	pkgconfig(libxslt)
 BuildRequires: 	pkgconfig(libxml-2.0)
 BuildRequires: 	pkgconfig(libpulse)
 BuildRequires: 	pkgconfig(xt)
+BuildRequires: 	pkgconfig(libdrm)
 BuildRequires: 	cap-devel
 BuildRequires: 	elfutils-devel
 BuildRequires: 	pkgconfig(gnutls)
@@ -508,6 +509,7 @@ myconf_gn+=" proprietary_codecs=false"
 myconf_gn+=" enable_ac3_eac3_audio_demuxing=true "
 myconf_gn+=" enable_hevc_demuxing=true "
 myconf_gn+=" enable_mse_mpeg2ts_stream_parser=true "
+myconf_gn+=" use_pulseaudio=true "
 %ifarch i586
 myconf_gn+=" target_cpu=\"x86\""
 %endif
@@ -521,6 +523,7 @@ myconf_gn+=" rtc_build_with_neon=true"
 %endif
 %ifarch aarch64
 myconf_gn+=" target_cpu=\"arm64\""
+myconf_gn+=" ffmpeg_target_arch=\"arm64\""
 %endif
 myconf_gn+=" google_api_key=\"%{google_api_key}\""
 myconf_gn+=" google_default_client_id=\"%{google_default_client_id}\""
@@ -531,6 +534,7 @@ gn_system_libraries="
     flac
     libjpeg
     libpng
+    libdrm
     libwebp
     libusb
     libxml
