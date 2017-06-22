@@ -128,6 +128,7 @@ Patch104:	chromium-system-ffmpeg-r3.patch
 Patch111:	chromium-55-extra-media.patch
 #Patch112:	chromium-40-wmvflvmpg.patch
 Patch114:	chromium-55-flac.patch
+Patch115:	nspr.patch
 
 
 Provides: 	%{crname}
