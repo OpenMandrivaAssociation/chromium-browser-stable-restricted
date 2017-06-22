@@ -129,6 +129,7 @@ Patch111:	chromium-55-extra-media.patch
 #Patch112:	chromium-40-wmvflvmpg.patch
 Patch114:	chromium-55-flac.patch
 Patch115:	nspr.patch
+Patch116:	chromium-system-icu-r1.patch
 
 
 Provides: 	%{crname}
