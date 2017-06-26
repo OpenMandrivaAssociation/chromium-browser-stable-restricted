@@ -30,7 +30,7 @@
 %bcond_without	system_ffmpeg
 %bcond_without	system_minizip
 # chromium 58 fails with system vpx 1.6.1
-%bcond_without	system_vpx
+%bcond_with	system_vpx
 %bcond_without	system_harfbuzz
 
 # Always support proprietary codecs
