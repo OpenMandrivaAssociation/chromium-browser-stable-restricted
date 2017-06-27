@@ -7,7 +7,7 @@
 %define _src %{_topdir}/SOURCES
 # Valid current basever numbers can be found at
 # http://omahaproxy.appspot.com/
-%define basever 56.0.2924.87
+%define basever 59.0.3071.109
 %define	debug_package %nil
 
 %ifarch %ix86
@@ -24,10 +24,13 @@
 %bcond_without	plf
 # Chromium breaks on wayland, hidpi, and colors with gtk3 enabled.
 %bcond_with	gtk3
-%bcond_with	system_icu
+# crisb - ozone causes a segfault on startup as of 57.0.2987.133
+%bcond_with	ozone
+%bcond_without	system_icu
 %bcond_without	system_ffmpeg
 %bcond_without	system_minizip
-%bcond_without	system_vpx
+# chromium 58 fails with system vpx 1.6.1
+%bcond_with	system_vpx
 %bcond_without	system_harfbuzz
 
 # Always support proprietary codecs
@@ -39,7 +42,7 @@
 
 Name: 		chromium-browser-stable
 Version: 	%basever
-Release: 	5%{?extrarelsuffix}
+Release: 	2%{?extrarelsuffix}
 Summary: 	A fast webkit-based web browser
 Group: 		Networking/WWW
 License: 	BSD, LGPL
@@ -53,13 +56,17 @@ Source3:	master_preferences
 # Don't use clang's integrated as while trying to check the version of gas
 #Patch4:		chromium-36.0.1985.143-clang-no-integrated-as.patch
 %endif
-Patch5:		chromium-54.0.2840.100-dont-crash-with-glibc-2.24.patch
 
 ### Chromium Fedora Patches ###
-Patch1:         chromium-56.0.2924.87-gcc5.patch
-Patch2:         chromium-45.0.2454.101-linux-path-max.patch
-Patch3:         chromium-55.0.2883.75-addrfix.patch
+Patch0:         chromium-56.0.2924.87-gcc5.patch
+Patch1:         chromium-45.0.2454.101-linux-path-max.patch
+Patch2:         chromium-55.0.2883.75-addrfix.patch
 Patch4:         chromium-46.0.2490.71-notest.patch
+# In file included from ../linux/directory.c:21:
+# In file included from ../../../../native_client/src/nonsfi/linux/abi_conversion.h:20:
+# ../../../../native_client/src/nonsfi/linux/linux_syscall_structs.h:44:13: error: GNU-style inline assembly is disabled
+#     __asm__ __volatile__("mov %%gs, %0" : "=r"(gs));
+#             ^
 # Ignore broken nacl open fd counter
 Patch7:         chromium-47.0.2526.80-nacl-ignore-broken-fd-counter.patch
 # Use libusb_interrupt_event_handler from current libusbx (1.0.21-0.1.git448584a)
@@ -67,17 +74,12 @@ Patch9:         chromium-48.0.2564.116-libusb_interrupt_event_handler.patch
 # Ignore deprecations in cups 2.2
 # https://bugs.chromium.org/p/chromium/issues/detail?id=622493
 Patch12:        chromium-55.0.2883.75-cups22.patch
-# Add ICU Text Codec aliases (from openSUSE via Russian Fedora)
-Patch14:        chromium-55.0.2883.75-more-codec-aliases.patch
 # Use PIE in the Linux sandbox (from openSUSE via Russian Fedora)
 Patch15:        chromium-55.0.2883.75-sandbox-pie.patch
 # Enable ARM CPU detection for webrtc (from archlinux via Russian Fedora)
 Patch16:        chromium-52.0.2743.82-arm-webrtc.patch
 # Use /etc/chromium for master_prefs
 Patch18:        chromium-52.0.2743.82-master-prefs-path.patch
-# Disable MADV_FREE (if set by glibc)
-# https://bugzilla.redhat.com/show_bug.cgi?id=1361157
-Patch19:        chromium-52.0.2743.116-unset-madv_free.patch
 # Use gn system files
 Patch20:        chromium-54.0.2840.59-gn-system.patch
 # Fix last commit position issue
@@ -86,32 +88,49 @@ Patch21:        chromium-53.0.2785.92-last-commit-position.patch
 # Fix issue where timespec is not defined when sys/stat.h is included.
 Patch22:        chromium-53.0.2785.92-boringssl-time-fix.patch
 # I wouldn't have to do this if there was a standard way to append extra compiler flags
-Patch24:        chromium-54.0.2840.59-nullfix.patch
+Patch24:        chromium-59.0.3071.86-nullfix.patch
 # Add explicit includedir for jpeglib.h
 Patch25:        chromium-54.0.2840.59-jpeg-include-dir.patch
 # On i686, pass --no-keep-memory --reduce-memory-overheads to ld.
-Patch26:        chromium-54.0.2840.59-i686-ld-memory-tricks.patch
+Patch26:        chromium-59.0.3071.86-i686-ld-memory-tricks.patch
 # obj/content/renderer/renderer/child_frame_compositing_helper.o: In function `content::ChildFrameCompositingHelper::OnSetSurface(cc::SurfaceId const&, gfx::Size const&, float, cc::SurfaceSequence const&)':
 # /builddir/build/BUILD/chromium-54.0.2840.90/out/Release/../../content/renderer/child_frame_compositing_helper.cc:214: undefined reference to `cc_blink::WebLayerImpl::setOpaque(bool)'
-Patch27:        chromium-54.0.2840.90-setopaque.patch
-# Fix rvalue issue in remoting code
-# https://chromium.googlesource.com/chromium/src.git/+/29bfbecb49572b61264de7acccf8b23942bba43d%5E%21/#F0
-Patch29:        chromium-55.0.2883.87-rvalue-fix.patch
-# Fix compiler issue with gcc 4.9
-# https://chromium.googlesource.com/external/webrtc/trunk/webrtc/+/69556b1c264da9e0f484eaab890ebd555966630c%5E%21/#F0
-Patch30:        chromium-56.0.2924.87-gcc-49.patch
+Patch27:        chromium-59.0.3071.86-setopaque.patch
 # Use -fpermissive to build WebKit
 Patch31:        chromium-56.0.2924.87-fpermissive.patch
-# Fix issue with unique_ptr move on return with older gcc
-Patch32:        chromium-56.0.2924.87-unique-ptr-fix.patch
+# Fix issue with compilation on gcc7
+# Thanks to Ben Noordhuis
+Patch33:        chromium-59.0.3071.86-gcc7.patch
+# Enable mp3 support
+Patch34:        chromium-59.0.3071.86-enable-mp3.patch
+# Revert https://chromium.googlesource.com/chromium/src/+/b794998819088f76b4cf44c8db6940240c563cf4%5E%21/#F0
+# https://bugs.chromium.org/p/chromium/issues/detail?id=712737
+# https://bugzilla.redhat.com/show_bug.cgi?id=1446851
+Patch36:        chromium-58.0.3029.96-revert-b794998819088f76b4cf44c8db6940240c563cf4.patch
+# Correctly compile the stdatomic.h in ffmpeg with gcc 4.8
+Patch37:        chromium-59.0.3071.86-ffmpeg-stdatomic.patch
+# RHEL is too old to have this header in kernel-headers
+# and some Fedora versions do not contain what Chromium expects to find
+# so just use the hardcoded values instead
+Patch38:        chromium-59.0.3071.86-dma-buf-header-hack.patch
+# Nacl can't die soon enough
+Patch39:        chromium-59.0.3071.86-system-clang.patch
+
 ### Chromium Tests Patches ###
 Patch100:       chromium-46.0.2490.86-use_system_opus.patch
-Patch101:       chromium-55.0.2883.75-use_system_harfbuzz.patch
-Patch102:	arm64-support.patch
+Patch101:       chromium-58.0.3029.81-use_system_harfbuzz.patch
+
 # suse, system libs
 Patch103:	arm_use_right_compiler.patch
 Patch104:	chromium-system-ffmpeg-r3.patch
-Patch105:	chromium-system-jinja-r13.patch
+
+# mga
+Patch111:	chromium-55-extra-media.patch
+#Patch112:	chromium-40-wmvflvmpg.patch
+Patch114:	chromium-55-flac.patch
+Patch115:	nspr.patch
+Patch116:	chromium-system-icu-r1.patch
+
 
 Provides: 	%{crname}
 Obsoletes: 	chromium-browser-unstable < 26.0.1410.51
@@ -147,7 +166,7 @@ BuildRequires:  pkgconfig(libavformat) >= 57.41.100
 BuildRequires:  pkgconfig(libavutil)
 %endif
 %if %{with gtk3}
-BuildRequires:	gtk+3.0-devel
+BuildRequires: gtk+3.0-devel
 %endif
 BuildRequires:	gtk+2.0-devel
 BuildRequires: 	pkgconfig(nspr)
@@ -167,6 +186,7 @@ BuildRequires: 	pkgconfig(libxslt)
 BuildRequires: 	pkgconfig(libxml-2.0)
 BuildRequires: 	pkgconfig(libpulse)
 BuildRequires: 	pkgconfig(xt)
+BuildRequires: 	pkgconfig(libdrm)
 BuildRequires: 	cap-devel
 BuildRequires: 	elfutils-devel
 BuildRequires: 	pkgconfig(gnutls)
@@ -191,6 +211,7 @@ BuildRequires:	python2
 BuildRequires:	python
 %endif
 BuildRequires:	ninja
+BuildRequires:	nodejs
 BuildRequires:	python2-markupsafe
 BuildRequires:	python2-ply
 BuildRequires:	python2-beautifulsoup4
@@ -251,6 +272,10 @@ cmp $FILE $FILE.orig && exit 1
 # sure it sees python2 when it calls python
 ln -s %{_bindir}/python2 python
 
+# use the system nodejs
+mkdir -p third_party/node/linux/node-linux-x64/bin
+ln -s /usr/bin/node third_party/node/linux/node-linux-x64/bin/
+
 # Remove bundled libs
 keeplibs=(
     base/third_party/dmg_fp
@@ -297,6 +322,7 @@ keeplibs=(
     third_party/fips181
     third_party/flatbuffers
     third_party/flot
+    third_party/freetype
     third_party/google_input_tools
     third_party/google_input_tools/third_party/closure_library
     third_party/google_input_tools/third_party/closure_library/third_party/closure
@@ -312,6 +338,7 @@ keeplibs=(
     third_party/libphonenumber
     third_party/libsecret
     third_party/libsrtp
+    third_party/libdrm
     third_party/libudev
     third_party/libusb
     third_party/libwebm
@@ -322,6 +349,8 @@ keeplibs=(
     third_party/mesa
     third_party/modp_b64
     third_party/mt19937ar
+    third_party/node
+    third_party/node/node_modules/vulcanize/third_party/UglifyJS2
     third_party/openh264
     third_party/openmax_dl
     third_party/opus
@@ -330,13 +359,12 @@ keeplibs=(
     third_party/pdfium/third_party/agg23
     third_party/pdfium/third_party/base
     third_party/pdfium/third_party/bigint
+    third_party/pdfium/third_party/build
     third_party/pdfium/third_party/freetype
     third_party/pdfium/third_party/lcms2-2.6
-    third_party/pdfium/third_party/libjpeg
     third_party/pdfium/third_party/libopenjpeg20
     third_party/pdfium/third_party/libpng16
     third_party/pdfium/third_party/libtiff
-    third_party/pdfium/third_party/zlib_v128
     third_party/polymer
     third_party/protobuf
     third_party/protobuf/third_party/six
@@ -391,6 +419,11 @@ keeplibs+=(
     base/third_party/libevent
     third_party/adobe
     third_party/speech-dispatcher
+    third_party/swiftshader \
+    third_party/swiftshader/third_party/subzero \
+    third_party/swiftshader/third_party/LLVM \
+    third_party/swiftshader/third_party/llvm-subzero \
+    third_party/swiftshader/third_party/pnacl-subzero \
     third_party/usb_ids
     third_party/xdg-utils
     third_party/yasm/run_yasm.py
@@ -464,13 +497,22 @@ myconf_gn+=" use_gtk3=true "
 %else
 myconf_gn+=" use_gtk3=false "
 %endif
+%if %{with ozone}
+myconf_gn+=" use_ozone=true "
+%endif
 myconf_gn+=" enable_nacl=false "
+myconf_gn+=" proprietary_codecs=true "
 %if %{with plf}
+myconf_gn+=" enable_nacl=false "
 myconf_gn+=" proprietary_codecs=true "
 myconf_gn+=" ffmpeg_branding=\"Chrome\" "
 %else
 myconf_gn+=" proprietary_codecs=false"
 %endif
+myconf_gn+=" enable_ac3_eac3_audio_demuxing=true "
+myconf_gn+=" enable_hevc_demuxing=true "
+myconf_gn+=" enable_mse_mpeg2ts_stream_parser=true "
+myconf_gn+=" use_pulseaudio=true "
 %ifarch i586
 myconf_gn+=" target_cpu=\"x86\""
 %endif
@@ -484,6 +526,7 @@ myconf_gn+=" rtc_build_with_neon=true"
 %endif
 %ifarch aarch64
 myconf_gn+=" target_cpu=\"arm64\""
+myconf_gn+=" ffmpeg_target_arch=\"arm64\""
 %endif
 myconf_gn+=" google_api_key=\"%{google_api_key}\""
 myconf_gn+=" google_default_client_id=\"%{google_default_client_id}\""
@@ -494,9 +537,8 @@ gn_system_libraries="
     flac
     libjpeg
     libpng
+    libdrm
     libwebp
-    opus
-    libevent
     libusb
     libxml
     libxslt
@@ -504,6 +546,8 @@ gn_system_libraries="
     snappy
     yasm
 "
+# cb - chrome 58
+# libevent as system lib causes some hanging issues particularly with extensions
 
 %if %{with system_minizip}
 gn_system_libraries+=" zlib"
@@ -520,10 +564,6 @@ gn_system_libraries+=" libvpx"
 %if %{with system_ffmpeg}
 gn_system_libraries+=" ffmpeg"
 %endif
-
-# make up a version for widevine
-sed '14i#define WIDEVINE_CDM_VERSION_STRING "Something fresh"' -i "third_party/widevine/cdm/stub/widevine_cdm_version.h"
-
 python2 build/linux/unbundle/replace_gn_files.py --system-libraries ${gn_system_libraries}
 
 python2 tools/gn/bootstrap/bootstrap.py -v --gn-gen-args "${myconf_gn}"
@@ -545,6 +585,8 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/themes
 mkdir -p %{buildroot}%{_libdir}/%{name}/default_apps
 mkdir -p %{buildroot}%{_mandir}/man1
 install -m 755 %{SOURCE1} %{buildroot}%{_libdir}/%{name}/
+# fix loading libraries, since LD_LIBRARY_PATH not working
+sed -i 's!REPLACE_LIBDIR!%{_libdir}!g' %{buildroot}%{_bindir}/%{name}
 install -m 755 out/Release/chrome %{buildroot}%{_libdir}/%{name}/
 install -m 4755 out/Release/chrome_sandbox %{buildroot}%{_libdir}/%{name}/chrome-sandbox
 cp -a out/Release/chromedriver %{buildroot}%{_libdir}/%{name}/chromedriver
@@ -552,7 +594,9 @@ install -m 644 out/Release/chrome.1 %{buildroot}%{_mandir}/man1/%{name}.1
 install -m 644 out/Release/locales/*.pak %{buildroot}%{_libdir}/%{name}/locales/
 install -m 644 out/Release/chrome_100_percent.pak %{buildroot}%{_libdir}/%{name}/
 install -m 644 out/Release/resources.pak %{buildroot}%{_libdir}/%{name}/
+%if !%{with system_icu}
 install -m 644 out/Release/icudtl.dat %{buildroot}%{_libdir}/%{name}/
+%endif
 install -m 644 out/Release/*.bin %{buildroot}%{_libdir}/%{name}/
 install -m 644 chrome/browser/resources/default_apps/* %{buildroot}%{_libdir}/%{name}/default_apps/
 ln -s %{_libdir}/%{name}/chromium-wrapper %{buildroot}%{_bindir}/%{name}
@@ -589,7 +633,9 @@ find %{buildroot} -name "*.nexe" -exec strip {} \;
 %{_libdir}/%{name}/chromium-wrapper
 %{_libdir}/%{name}/chrome
 %{_libdir}/%{name}/chrome-sandbox
+%if !%{with system_icu}
 %{_libdir}/%{name}/icudtl.dat
+%endif
 %{_libdir}/%{name}/locales
 %{_libdir}/%{name}/chrome_100_percent.pak
 %{_libdir}/%{name}/resources.pak
