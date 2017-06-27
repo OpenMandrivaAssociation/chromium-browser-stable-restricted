@@ -592,7 +592,7 @@ install -m 644 out/Release/chrome.1 %{buildroot}%{_mandir}/man1/%{name}.1
 install -m 644 out/Release/locales/*.pak %{buildroot}%{_libdir}/%{name}/locales/
 install -m 644 out/Release/chrome_100_percent.pak %{buildroot}%{_libdir}/%{name}/
 install -m 644 out/Release/resources.pak %{buildroot}%{_libdir}/%{name}/
-%if %{with system_icu}
+%if !%{with system_icu}
 install -m 644 out/Release/icudtl.dat %{buildroot}%{_libdir}/%{name}/
 %endif
 install -m 644 out/Release/*.bin %{buildroot}%{_libdir}/%{name}/
@@ -631,7 +631,7 @@ find %{buildroot} -name "*.nexe" -exec strip {} \;
 %{_libdir}/%{name}/chromium-wrapper
 %{_libdir}/%{name}/chrome
 %{_libdir}/%{name}/chrome-sandbox
-%if %{with system_icu}
+%if !%{with system_icu}
 %{_libdir}/%{name}/icudtl.dat
 %endif
 %{_libdir}/%{name}/locales
