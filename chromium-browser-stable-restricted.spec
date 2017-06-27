@@ -42,7 +42,7 @@
 
 Name: 		chromium-browser-stable
 Version: 	%basever
-Release: 	1%{?extrarelsuffix}
+Release: 	2%{?extrarelsuffix}
 Summary: 	A fast webkit-based web browser
 Group: 		Networking/WWW
 License: 	BSD, LGPL
@@ -585,6 +585,8 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/themes
 mkdir -p %{buildroot}%{_libdir}/%{name}/default_apps
 mkdir -p %{buildroot}%{_mandir}/man1
 install -m 755 %{SOURCE1} %{buildroot}%{_libdir}/%{name}/
+# fix loading libraries, since LD_LIBRARY_PATH not working
+sed -i 's!REPLACE_LIBDIR!%{_libdir}!g' %{buildroot}%{_bindir}/%{name}
 install -m 755 out/Release/chrome %{buildroot}%{_libdir}/%{name}/
 install -m 4755 out/Release/chrome_sandbox %{buildroot}%{_libdir}/%{name}/chrome-sandbox
 cp -a out/Release/chromedriver %{buildroot}%{_libdir}/%{name}/chromedriver
