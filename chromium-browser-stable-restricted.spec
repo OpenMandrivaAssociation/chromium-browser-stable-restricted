@@ -162,6 +162,7 @@ Obsoletes: 	chromium-browser-unstable < 26.0.1410.51
 Obsoletes: 	chromium-browser-beta < 26.0.1410.51
 Obsoletes: 	chromium-browser < 1:9.0.597.94
 BuildRequires: 	c++-devel
+BuildRequires: 	glibc-devel
 BuildRequires: 	gperf
 BuildRequires: 	bison
 BuildRequires: 	re2c
