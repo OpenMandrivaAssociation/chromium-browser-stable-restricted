@@ -305,8 +305,6 @@ ln -s /usr/bin/node third_party/node/linux/node-linux-x64/bin/
 
 # Remove bundled libs
 keeplibs=(
-	buildtools/third_party/libc++
-	buildtools/third_party/libc++abi
 	base/third_party/dmg_fp
 	base/third_party/dynamic_annotations
 	base/third_party/icu
