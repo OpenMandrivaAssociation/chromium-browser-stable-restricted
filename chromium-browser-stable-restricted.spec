@@ -257,7 +257,7 @@ members of the Chromium and WebDriver teams.
 
 %prep
 %setup -q -n chromium-%{basever}
-%apply_patches
+%autopatch -p1
 
 rm -rf third_party/binutils/
 
